@@ -11,7 +11,7 @@ $recapito = $rawdata['recapito'];
 $quanti = $rawdata['quanti'];
 $proiezione = $rawdata['proiezione'];
 
-$stmt = $pdo->query("SELECT (sala.postiDisponibili - t.occupati) as posti
+$stmt = $pdo->query("SELECT (sala.postiDisponibili - t.occupati) as posti, sala.postiDisponibili
 FROM sala, proiezione, (
         SELECT SUM(assistea.quanti) as occupati
         FROM proiezione, assistea
@@ -23,6 +23,10 @@ WHERE sala.id = proiezione.idSala
 AND proiezione.id = '$proiezione'");
 
 $stmt = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($stmt['posti'] == null){
+    $stmt['posti'] = $stmt['postiDisponibili'];
+}
+
 
 if ($stmt['posti'] < $quanti){
     echo json_encode("Posti esauriti");
